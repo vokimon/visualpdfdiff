@@ -1,0 +1,5 @@
+__pyc__
+*.pyc
+*.egg-info
+dist
+*.sw?
