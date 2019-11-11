@@ -68,9 +68,9 @@ Using the back2back command.
 
 ```yaml
 myTest:
-	command: ./myreportscript.py -o output.pdf
-	outputs:
-	- output.pdf
+  command: ./myreportscript.py -o output.pdf
+  outputs:
+  - output.pdf
 ```
 
 
