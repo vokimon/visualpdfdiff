@@ -1,0 +1,14 @@
+#!/usr/bin/env back2back 
+
+datapath: "b2bdata" # Point it to the directory containing your reference data
+testcases:
+  constant:
+    command: "convert -size 200x200 logo: rose: output.pdf"
+    outputs:
+    - output.pdf
+
+  alwaysdifferent:
+    command: "convert -size 200x200 -gravity center label:\"$(date)\" logo: rose: output.pdf"
+    outputs:
+    - output.pdf
+
