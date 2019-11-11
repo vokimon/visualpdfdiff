@@ -9,7 +9,7 @@ try: from pathlib2 import Path
 except ImportError: from pathlib import Path
 from itertools import zip_longest
 
-from consolemsg import step, warn, out
+from consolemsg import step, warn, out, fail
 
 def step(*args): pass
 
@@ -218,14 +218,30 @@ def visualEqual(a, b, outputdiff=None, **params):
 def diff(a,b,diff):
 	return visualEqual(Path(a), Path(b), diff and Path(diff))
 
+usage="""\
+Usage: {} <doc1.pdf> <doc2.pdf> [<diff.pdf>]
 
-if __name__ == '__main__':
+Returns 0 if there is no significant visual differences.
+Returns 1 if the diferences are found.
+Returns other number if an error happens.
+
+If the third argument is provided a side by side diff
+pdf is produced with the differences encircled in red.
+"""
+
+def main():
+	if len(sys.argv)<3:
+		fail("Wrong arguments\n{}".format(usage))
+
 	a,b = (Path(x) for x in sys.argv[1:3])
 	output = Path(sys.argv[3]) if len(sys.argv)>3 else None
 
 	tmpchanges("start")
 	print(visualEqual(a,b,output))
 	tmpchanges("end")
+
+if __name__ == '__main__':
+	main()
 
 
 
