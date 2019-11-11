@@ -12,7 +12,7 @@ You can use this in several ways:
 
 The generated diff looks like this:
 
-![Diff example](docs/example.png)
+![Diff output example](docs/example.png)
 
 ## Comand line diff tool
 
