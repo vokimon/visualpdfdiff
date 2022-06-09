@@ -8,7 +8,7 @@ You can use this in several ways:
 - a Python function to do the same from other Python programs
 - an equality assertion to be used in `python-unittest`
 - a back-to-back assertion to be used in `python-unittest`
-- an extension for the tool [`back2back`](https://github.com/vokimon/back2back) to make back-to-back tests of the outputs of your commands
+- an extension for the tool [`back2back`](https://github.com/vokimon/back2back) to make back-to-back tests of the PDF outputs of your commands
 
 The generated diff looks like this:
 
