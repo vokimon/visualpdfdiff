@@ -11,6 +11,7 @@ setup(
 		'consolemsg',
 		'wand',
 		'PyPdf2',
+		'future',
 		'pathlib2;python_version<"3.5"',
 		],
 	description = "Side by side visual comparision differences for PDF documents",

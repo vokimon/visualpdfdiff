@@ -102,7 +102,7 @@ def highlightDifferences(diffimage):
 	diffimage.morphology(method='dilate',kernel='square:2')
 	# invert to compute the edge arround them
 	diffimage.negate()
-	# find the edte of a 
+	# find the edge, 2 points wide
 	diffimage.edge(2)
 	# say we wanna have effect on alpha as well
 	diffimage.channel='argb'
