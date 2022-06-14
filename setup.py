@@ -19,6 +19,7 @@ setup(
 	author_email = "voki@canvoki.net",
 	url = 'https://github.com/vokimon/back2back-pdf',
 	long_description = readme,
+	long_description_content_type = 'text/markdown',
 	license = 'GNU General Public License v3 or later (GPLv3+)',
 	entry_points = {
 		'console_scripts': [
