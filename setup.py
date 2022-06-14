@@ -6,7 +6,7 @@ readme = open('README.md', encoding='utf8').read()
 
 setup(
 	name = "visualpdfdiff",
-	version = "0.1",
+	version = "1.0",
 	install_requires=[
 		'consolemsg',
 		'wand',
