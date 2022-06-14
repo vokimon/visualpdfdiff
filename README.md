@@ -84,6 +84,19 @@ myTest:
   - output.pdf
 ```
 
+## Similar tools
+
+- [pdfdiff:](https://github.com/JoshData/pdf-diff)
+	Extracts text and diff that, then draws an outline on the text.
+	Better for text diffing, but not so for layout diffing.
+- [qtrac's diffpdf:](http://www.qtrac.eu/diffpdf-foss.html)
+	A quite nice (qt-based) graphical tool that does both text and visual diffing.
+	Is not maintained anymore since the authors moved to a close source license.
+- [vslavik's diff-pdf:](https://vslavik.github.io/diff-pdf/)
+- [diff-pdf-visualy](https://github.com/bgeron/diff-pdf-visually)
+	Quite similar to this one, not just in name, but does not generate an output pdf
+
+
 ## CHANGES
 
 ### 1.0 (Unreleased)
@@ -95,16 +108,7 @@ myTest:
 
 - Raster resolution configurable by keywords
 - Diff metadata as well
-- Make overlay fully transparent within the diff zone, and just translucent like in the matching zone
+- Make an overlay fully transparent within the diff zone, and translucent gray in the matching zone
 
 
-## Similar tools
-
-- [pdfdiff:](https://github.com/JoshData/pdf-diff)
-	Extracts text and diff that, then draws an outline on the text.
-	Better for text diffing, but not so for layout diffing.
-- [qtrac's diffpdf:](http://www.qtrac.eu/diffpdf-foss.html)
-	A quite nice (qt-based) graphical tool that does both text and visual diffing.
-	Is not maintained anymore since the authors moved to a close source license.
-- [vslavik's diff-pdf:](https://vslavik.github.io/diff-pdf/)
 
