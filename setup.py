@@ -17,7 +17,7 @@ setup(
 	description = "Side by side visual comparision differences for PDF documents",
 	author = "David Garcia Garzon",
 	author_email = "voki@canvoki.net",
-	url = 'https://github.com/vokimon/back2back-pdf',
+	url = 'https://github.com/vokimon/visualpdfdiff',
 	long_description = readme,
 	long_description_content_type = 'text/markdown',
 	license = 'GNU General Public License v3 or later (GPLv3+)',

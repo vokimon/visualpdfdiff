@@ -1,5 +1,13 @@
 # Visual PDF diff
 
+[![CI Status](https://github.com/GuifiBaix/visualpdfdiff/actions/workflows/main.yml/badge.svg)](https://github.com/GuifiBaix/visualpdfdiff/actions/workflows/main.yml)
+[![Coverage Status](https://coveralls.io/repos/github/GuifiBaix/visualpdfdiff/badge.svg?branch=master)](https://coveralls.io/github/GuifiBaix/visualpdfdiff?branch=master)
+![PyPI](https://img.shields.io/pypi/v/visualpdfdiff)
+![PyPI - Downloads](https://img.shields.io/pypi/dm/visualpdfdiff)
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/visualpdfdiff)
+
+
+
 Visual side by side comparision of rendered PDF documents.
 
 You can use this in several ways:
