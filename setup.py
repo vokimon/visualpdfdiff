@@ -10,7 +10,7 @@ setup(
 	install_requires=[
 		'consolemsg',
 		'wand',
-		'PyPdf2',
+		'pypdf>=3.0',
 		'future',
 		'pathlib2;python_version<"3.5"',
 		],

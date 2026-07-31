@@ -31,31 +31,31 @@ def tmpchanges(context):
 	
 
 def buildDiffPdf(a, b, overlay, output, **params):
-	import PyPDF2
-	from io import open, BytesIO
+	import pypdf
+	from io import BytesIO
 
 	if overlay:
 		overlayfile = BytesIO(overlay)
 
 	step("Building diff pdf")
 	def pages(reader):
-		for i in range(reader.getNumPages()):
-			yield reader.getPage(i)
+		for i in range(len(reader.pages)):
+			yield reader.pages[i]
 
 	with \
 		a.open('rb') as afile, \
 		b.open('rb') as bfile, \
 		output.open('wb') as outputfile \
 		:
-		areader = PyPDF2.PdfFileReader(afile)
-		breader = PyPDF2.PdfFileReader(bfile)
-		diffreader = PyPDF2.PdfFileReader(overlayfile)
-		writer = PyPDF2.PdfFileWriter()
+		areader = pypdf.PdfReader(afile)
+		breader = pypdf.PdfReader(bfile)
+		diffreader = pypdf.PdfReader(overlayfile)
+		writer = pypdf.PdfWriter()
 		# TODO: zip_longest instead of zip and manage Nones
 		def blankLike(otherPage):
-			return PyPDF2.pdf.PageObject.createBlankPage(
-				width=otherPage.mediaBox.getUpperRight_x(),
-				height=otherPage.mediaBox.getLowerRight_y(),
+			return pypdf._page.PageObject.create_blank_page(
+				width=otherPage.mediabox.width,
+				height=otherPage.mediabox.height,
 			)
 
 		for apage, bpage, diffpage in zip_longest(pages(areader), pages(breader), pages(diffreader)):
@@ -65,13 +65,13 @@ def buildDiffPdf(a, b, overlay, output, **params):
 			assert diffpage
 			apage = apage or blankLike(bpage)
 			bpage = bpage or blankLike(apage)
-			xoffset = apage.mediaBox.getUpperRight_x()
-			apage.mergeTranslatedPage(bpage, xoffset, 0, True)
+			xoffset = apage.mediabox.width
+			apage.merge_translated_page(bpage, xoffset, 0, True)
 			if not missingB:
-				apage.mergeTranslatedPage(diffpage, 0, 0, True)
+				apage.merge_translated_page(diffpage, 0, 0, True)
 			if not missingA:
-				apage.mergeTranslatedPage(diffpage, xoffset, 0, True)
-			writer.addPage(apage)
+				apage.merge_translated_page(diffpage, xoffset, 0, True)
+			writer.add_page(apage)
 		step(" Writing pdf")
 		writer.write(outputfile)
 
