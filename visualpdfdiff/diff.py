@@ -329,7 +329,7 @@ def main():
 	output = Path(sys.argv[3]) if len(sys.argv)>3 else None
 
 	tmpchanges("start")
-	print(visualEqual(a,b,output))
+	visualEqual(a,b,output)
 	tmpchanges("end")
 
 if __name__ == '__main__':

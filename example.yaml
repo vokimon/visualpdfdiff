@@ -17,4 +17,10 @@ testcases:
     command: "convert -size 200x200 -gravity center label:\"$(date)\" logo: rose: output.pdf"
     outputs:
     - output.pdf
-
+  visualdiff:
+    command: >
+      convert -size 100x300 -gravity center -background white label:"Hello World" /tmp/_vdiff_a.pdf &&
+      convert -size 100x300 -gravity center -background white label:"Hello Korld" /tmp/_vdiff_b.pdf &&
+      visualpdfdiff /tmp/_vdiff_a.pdf /tmp/_vdiff_b.pdf output.pdf
+    outputs:
+    - output.pdf
