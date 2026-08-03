@@ -8,7 +8,7 @@ import sys
 try: from pathlib2 import Path
 except ImportError: from pathlib import Path
 from itertools import zip_longest
-
+import numpy as np
 from consolemsg import step, warn, out, fail
 
 def step(*args): pass
@@ -30,9 +30,16 @@ def tmpchanges(context):
 	]))
 
 
+def _fix_cropbox(page):
+	if '/CropBox' in page:
+		from pypdf.generic import NameObject
+		page[NameObject('/CropBox')] = page.mediabox
+
+
 def side_by_side(page_a, page_b):
 	"""Merge page_b to the right of page_a. Returns new page."""
 	page_a.merge_translated_page(page_b, tx=page_a.mediabox.width, ty=0, expand=True)
+	_fix_cropbox(page_a)
 	return page_a
 
 
@@ -44,7 +51,49 @@ def overlay_image(page, image):
 	blob = image.make_blob()
 	overlay_page = pypdf.PdfReader(BytesIO(blob)).pages[0]
 	page.merge_translated_page(overlay_page, tx=0, ty=0, expand=True)
+	_fix_cropbox(page)
 	return page
+
+
+def overlay_page(page, overlay_page, tx=0, ty=0):
+	"""Merge a pypdf page onto another at position (tx, ty). Returns new page."""
+	page.merge_translated_page(overlay_page, tx=tx, ty=ty, expand=True)
+	_fix_cropbox(page)
+	return page
+
+
+def mask_paint(target, mask, rgba):
+	"""Paint color onto target where mask is white."""
+	from wand.color import Color
+
+	dst = np.array(
+		target.export_pixels(channel_map='RGBA'),
+		dtype=np.uint8
+	).reshape(target.height, target.width, 4)
+
+	m = np.array(
+		mask.export_pixels(channel_map='R'),
+		dtype=np.uint8
+	).reshape(mask.height, mask.width)
+
+	sel = m > 127
+
+	c = Color(rgba)
+	dst[sel, :] = np.array([
+		c.red * 255,
+		c.green * 255,
+		c.blue * 255,
+		c.alpha * 255,
+	], dtype=np.uint8)
+
+	target.import_pixels(
+		0, 0,
+		target.width,
+		target.height,
+		'RGBA',
+		'char',
+		dst.tobytes()
+	)
 
 
 def build_diff_mask(img_a, img_b):
@@ -77,7 +126,7 @@ def buildDiffPdf(a, b, overlay, output, **params):
 		diffreader = pypdf.PdfReader(overlayfile)
 		writer = pypdf.PdfWriter()
 		# TODO: zip_longest instead of zip and manage Nones
-		def blankLike(otherPage):
+		def blankWithDimensionsOf(otherPage):
 			return pypdf._page.PageObject.create_blank_page(
 				width=otherPage.mediabox.width,
 				height=otherPage.mediabox.height,
@@ -88,14 +137,13 @@ def buildDiffPdf(a, b, overlay, output, **params):
 			missingA = not apage
 			missingB = not bpage
 			assert diffpage
-			apage = apage or blankLike(bpage)
-			bpage = bpage or blankLike(apage)
-			xoffset = apage.mediabox.width
-			apage.merge_translated_page(bpage, xoffset, 0, True)
+			apage = apage or blankWithDimensionsOf(bpage)
+			bpage = bpage or blankWithDimensionsOf(apage)
 			if not missingB:
-				apage.merge_translated_page(diffpage, 0, 0, True)
+				apage = overlay_page(apage, diffpage)
 			if not missingA:
-				apage.merge_translated_page(diffpage, xoffset, 0, True)
+				bpage = overlay_page(bpage, diffpage)
+			apage = side_by_side(apage, bpage)
 			writer.add_page(apage)
 		step(" Writing pdf")
 		writer.write(outputfile)
@@ -106,7 +154,7 @@ def centeredText(page, text, color="rgba(255,0,0,1)"):
 	page.opaque_paint('black', 'rgba(240,255,255,.4)', channel='all_channels')
 	from wand.drawing import Drawing
 	with Drawing() as draw:
-		draw.fill_color=f'$color'
+		draw.fill_color=f'{color}'
 		draw.stroke_color='grey'
 		draw.stroke_width = 2
 		draw.font_size=40
@@ -128,6 +176,7 @@ def highlightDifferences(diffimage, margin=2, edge_width=2):
 
 	total = margin + edge_width
 
+	diffimage.alpha_channel='activate'
 	with diffimage.clone() as total_area:
 		total_area.morphology(method='dilate', kernel=f'square:{total}')
 
@@ -137,20 +186,16 @@ def highlightDifferences(diffimage, margin=2, edge_width=2):
 			total_area.composite(interior, operator='difference')
 
 			with Image(width=diffimage.width, height=diffimage.height) as result:
+				result.alpha_channel='activate'
 				result.channel = 'argb'
 				result.alpha_channel = 'set'
-				result.background_color = Color('rgba(255,255,255,0.4)')
+				result.background_color = Color('rgba(255,255,0,0.4)')
 				result.alpha_channel = 'remove'
 
-				for y in range(result.height):
-					for x in range(result.width):
-						if interior[x, y].red > 0.5:
-							result[x, y] = Color('rgba(0,0,0,0)')
-						elif total_area[x, y].red > 0.5:
-							result[x, y] = Color('rgba(255,0,0,1)')
+				mask_paint(result, total_area, 'rgba(255,0,0,1)')
+				mask_paint(result, interior, 'rgba(0,0,0,0)')
 
-				diffimage.blank(result.width, result.height)
-				diffimage.composite(result)
+				diffimage.composite(result, 0, 0, 'copy')
 
 def rasterize(pdfimage):
 	# pdf's just have the inked parts, so,
@@ -212,11 +257,7 @@ def visualEqual(a, b, outputdiff=None, **params):
 						aimage.sequence[i] as apage, \
 						bimage.sequence[i] as bpage  \
 						:
-					diffpage, ndiffs = apage.compare(bpage,
-						metric='absolute',
-						highlight='white',
-						lowlight='black',
-						)
+					diffpage, ndiffs = build_diff_mask(apage, bpage)
 					page_has_differences = ndiffs > 1e-14
 					with diffpage:
 						# Not generating outputdiff? be expeditive
@@ -228,7 +269,7 @@ def visualEqual(a, b, outputdiff=None, **params):
 							hasdifferences=True
 							warn("Page {} contains {:,.10f} different pixels", i, ndiffs)
 							highlightDifferences(diffpage)
-						if not page_has_differences:
+						else:
 							centeredText(diffpage, "NO\nDIFFERENCES", "rgba(0,255,0,1)")
 
 						overlay.sequence.append(diffpage)
@@ -256,11 +297,11 @@ def diff(a,b,diff):
 def differences(expected, result, diffbase):
 	"""b2btest plugin interface: returns list of difference descriptions."""
 	result_pdf = Path(diffbase + '.pdf')
-	has_diffs = visualEqual(
+	are_equal = visualEqual(
 		Path(expected), Path(result),
 		result_pdf,
 	)
-	if not has_diffs:
+	if are_equal:
 		return []
 	return [
 		f"Visual differences found between {expected} and {result}. "

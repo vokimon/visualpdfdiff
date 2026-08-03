@@ -3,12 +3,15 @@ from io import BytesIO
 import pypdf
 from wand.image import Image
 from wand.color import Color
+from wand.drawing import Drawing
 from visualpdfdiff.diff import (
     build_diff_mask,
     side_by_side,
     overlay_image,
+    overlay_page,
     highlightDifferences,
     centeredText,
+    mask_paint,
 )
 
 COLOR_MAP = {
@@ -132,8 +135,45 @@ class TestHighlightDifferences(unittest.TestCase):
             self.assertEqual(img_to_str(mask), expected)
 
 
-if __name__ == '__main__':
-    unittest.main()
+def _make_test_mask(w=4, h=4):
+    mask = Image(width=w, height=h, background=Color('black'))
+    with Drawing() as d:
+        d.fill_color = Color('white')
+        d.rectangle(w//2-1, h//2-1, 2, 2)
+        d(mask)
+    return mask
+
+
+class TestMaskPaint(unittest.TestCase):
+    def test_mask_paint_rgb(self):
+        target = Image(width=4, height=4, background=Color('white'))
+        target.alpha_channel = 'set'
+        target.alpha_channel = 'remove'
+        mask = _make_test_mask()
+        mask_paint(target, mask, 'rgba(255,0,0,1)')
+        self.assertEqual(img_to_str(target), (
+            "WWWW\n"
+            "WRRW\n"
+            "WRRW\n"
+            "WWWW"
+        ))
+        target.close()
+        mask.close()
+
+    def test_mask_paint_alpha(self):
+        target = Image(width=4, height=4, background=Color('white'))
+        target.alpha_channel = 'set'
+        target.alpha_channel = 'remove'
+        mask = _make_test_mask()
+        mask_paint(target, mask, 'rgba(1,1,0,0)')
+        self.assertEqual(img_to_str(target), (
+            "WWWW\n"
+            "WTTW\n"
+            "WTTW\n"
+            "WWWW"
+        ))
+        target.close()
+        mask.close()
 
 
 def make_page(r, g, b, w, h):
@@ -159,6 +199,8 @@ def rasterize_page(page):
 
 
 class TestPdfPrimitives(unittest.TestCase):
+    def setUp(self):
+        self.maxDiff = None
 
     def test_make_page_red(self):
         page = make_page(1, 0, 0, 50, 50)
@@ -188,3 +230,17 @@ class TestPdfPrimitives(unittest.TestCase):
         self.assertEqual(img_to_str(raster), "\n".join(
             ["R" * 20] * 10
         ))
+
+    def test_overlay_page(self):
+        white = make_page(1, 1, 1, 4, 2)
+        red = make_page(1, 0, 0, 2, 2)
+        result = overlay_page(white, red, tx=2)
+        img = rasterize_page(result)
+        self.assertEqual(img_to_str(img), "\n".join(
+            ["W" * 2 + "R" * 2] * 2
+        ))
+
+if __name__ == '__main__':
+    unittest.main()
+
+
