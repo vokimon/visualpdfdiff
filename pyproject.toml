@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "visualpdfdiff"
+version = "1.0"
+description = "Side by side visual comparison differences for PDF documents"
+license = "GPL-3.0-or-later"
+requires-python = ">=3.10"
+authors = [
+    { name = "David Garcia Garzon", email = "voki@canvoki.net" },
+]
+classifiers = [
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Intended Audience :: Developers",
+    "Development Status :: 5 - Production/Stable",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "consolemsg",
+    "wand",
+    "pypdf>=3.0",
+    "numpy",
+]
+
+[project.urls]
+Homepage = "https://github.com/vokimon/visualpdfdiff"
+
+[project.scripts]
+visualpdfdiff = "visualpdfdiff.diff:main"
+
+[project.entry-points."back2back.diff"]
+pdf = "visualpdfdiff.diff:differences"
+
+[tool.setuptools.packages.find]
+exclude = ["*_test"]
