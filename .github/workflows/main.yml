@@ -26,11 +26,11 @@ jobs:
     name: Python ${{ matrix.python-version }}
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Install system dependencies
         run: |
           sudo apt install gcc libffi-dev libssl-dev libyaml-dev libxslt1-dev imagemagick
-      - uses: actions/setup-python@v2
+      - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
       - uses: BSFishy/pip-action@v1
@@ -45,7 +45,7 @@ jobs:
         run: |
           pytest --cov=visualpdfdiff visualpdfdiff
       - name: Coveralls
-        uses: AndreMiras/coveralls-python-action@develop
+        uses: AndreMiras/coveralls-python-action@4
         with:
           parallel: true
           flag-name: Unit tests
@@ -55,6 +55,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Coveralls Finished
-      uses: AndreMiras/coveralls-python-action@develop
+      uses: AndreMiras/coveralls-python-action@4
       with:
         parallel-finished: true
