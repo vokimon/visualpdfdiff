@@ -200,22 +200,21 @@ def visualEqual(a, b, outputdiff=None, **params):
 						highlight='white',
 						lowlight='black',
 						)
+					page_has_differences = ndiffs > 1e-14
 					with diffpage:
 						# Not generating outputdiff? be expeditive
 						if not outputdiff:
-							if ndiffs: return False
+							if page_has_differences: return False
 							continue
 
-						if ndiffs:
+						if page_has_differences:
 							hasdifferences=True
-							warn("Page {} contains {:,.0f} different pixels", i, ndiffs)
+							warn("Page {} contains {:,.10f} different pixels", i, ndiffs)
 							highlightDifferences(diffpage)
-						if not ndiffs:
+						if not page_has_differences:
 							centeredText(diffpage, "NO DIFFERENCES")
 
 						overlay.sequence.append(diffpage)
-
-
 
 			for i in range(min(nPagesA,nPagesB),nPagesA):
 				warn("Page {} only available in {}", i, a)
@@ -225,12 +224,11 @@ def visualEqual(a, b, outputdiff=None, **params):
 				warn("Page {} only available in {}", i, b)
 				addMissingPageOverlay(overlay, bimage.sequence[i])
 
-		if not outputdiff: return hasdifferences
+		if not outputdiff or not hasdifferences: return not hasdifferences
 
 		overlay.format='pdf'
 		diff_overlay = overlay.make_blob()
 
-		if not hasdifferences: return True
 		buildDiffPdf(a,b,diff_overlay,outputdiff)
 
 	return False
