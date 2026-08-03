@@ -1,12 +1,7 @@
 #!/usr/bin/env python
 
-# Required for zip_longest
-from future import standard_library
-standard_library.install_aliases()
-
 import sys
-try: from pathlib2 import Path
-except ImportError: from pathlib import Path
+from pathlib import Path
 from itertools import zip_longest
 import numpy as np
 from consolemsg import step, warn, out, fail
