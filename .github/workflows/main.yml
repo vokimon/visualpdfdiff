@@ -45,7 +45,7 @@ jobs:
         run: |
           pytest --cov=visualpdfdiff visualpdfdiff
       - name: Coveralls
-        uses: AndreMiras/coveralls-python-action@4
+        uses: AndreMiras/coveralls-python-action@develop
         with:
           parallel: true
           flag-name: Unit tests
@@ -55,6 +55,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Coveralls Finished
-      uses: AndreMiras/coveralls-python-action@4
+      uses: AndreMiras/coveralls-python-action@develop
       with:
         parallel-finished: true
