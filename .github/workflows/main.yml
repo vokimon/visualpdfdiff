@@ -43,7 +43,7 @@ jobs:
           pip install -e .
       - name: Unit tests
         run: |
-          pytest --cov=somutils somutils
+          pytest --cov=visualpdfdiff visualpdfdiff
       - name: Coveralls
         uses: AndreMiras/coveralls-python-action@develop
         with:
