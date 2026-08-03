@@ -30,6 +30,14 @@ def tmpchanges(context):
 	]))
 	
 
+def build_diff_mask(img_a, img_b):
+	"""Compare two Wand images. Returns (diff_image, ndiffs)."""
+	diff, ndiffs = img_a.compare(
+		img_b, metric='absolute', highlight='white', lowlight='black',
+	)
+	return diff, ndiffs
+
+
 def buildDiffPdf(a, b, overlay, output, **params):
 	import pypdf
 	from io import BytesIO
@@ -92,28 +100,40 @@ def centeredText(page, text):
 		draw.text(0,0,text)
 		draw(page)
 
-def highlightDifferences(diffimage):
+def highlightDifferences(diffimage, margin=2, edge_width=2):
 	"""Takes a B/W image with different pixels in white
 	over a black background and returns a highlight
 	semitransparent overlay with the corresponding pixels
 	encircled in red.
 	"""
-	# expand diffed dots to fill holes and having a margin
-	diffimage.morphology(method='dilate',kernel='square:2')
-	# invert to compute the edge arround them
-	diffimage.negate()
-	# find the edge, 2 points wide
-	diffimage.edge(2)
-	# say we wanna have effect on alpha as well
-	diffimage.channel='argb'
-	# needed for?
-	diffimage.fill_color='red'
-	# excange the white color by red
-	diffimage.opaque_paint('white', 'red')
-	# activate the alpha channel
-	diffimage.alpha_channel='activate'
-	# exchange the black color by semitransparent white
-	diffimage.opaque_paint('black', 'rgba(240,255,255,.4)', channel='all_channels')
+	from wand.image import Image
+	from wand.color import Color
+
+	total = margin + edge_width
+
+	with diffimage.clone() as total_area:
+		total_area.morphology(method='dilate', kernel=f'square:{total}')
+
+		diffimage.morphology(method='dilate', kernel=f'square:{margin}')
+
+		with diffimage.clone() as interior:
+			total_area.composite(interior, operator='difference')
+
+			with Image(width=diffimage.width, height=diffimage.height) as result:
+				result.channel = 'argb'
+				result.alpha_channel = 'set'
+				result.background_color = Color('rgba(255,255,255,0.4)')
+				result.alpha_channel = 'remove'
+
+				for y in range(result.height):
+					for x in range(result.width):
+						if interior[x, y].red > 0.5:
+							result[x, y] = Color('rgba(0,0,0,0)')
+						elif total_area[x, y].red > 0.5:
+							result[x, y] = Color('rgba(255,0,0,1)')
+
+				diffimage.blank(result.width, result.height)
+				diffimage.composite(result)
 
 def rasterize(pdfimage):
 	# pdf's just have the inked parts, so,
