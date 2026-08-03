@@ -100,13 +100,13 @@ def buildDiffPdf(a, b, overlay, output, **params):
 		step(" Writing pdf")
 		writer.write(outputfile)
 
-def centeredText(page, text):
+def centeredText(page, text, color="rgba(255,0,0,1)"):
 	"Draws a centered text in the middle of a page"
 	page.alpha_channel='activate'
 	page.opaque_paint('black', 'rgba(240,255,255,.4)', channel='all_channels')
 	from wand.drawing import Drawing
 	with Drawing() as draw:
-		draw.fill_color='rgba(255,0,0,1)'
+		draw.fill_color=f'$color'
 		draw.stroke_color='grey'
 		draw.stroke_width = 2
 		draw.font_size=40
@@ -229,7 +229,7 @@ def visualEqual(a, b, outputdiff=None, **params):
 							warn("Page {} contains {:,.10f} different pixels", i, ndiffs)
 							highlightDifferences(diffpage)
 						if not page_has_differences:
-							centeredText(diffpage, "NO DIFFERENCES")
+							centeredText(diffpage, "NO\nDIFFERENCES", "rgba(0,255,0,1)")
 
 						overlay.sequence.append(diffpage)
 
