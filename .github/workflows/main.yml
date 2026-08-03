@@ -20,9 +20,9 @@ jobs:
     strategy:
       matrix:
         python-version:
-          - '2.7'
           - '3.8'
           - '3.9'
+          - '3.14'
     name: Python ${{ matrix.python-version }}
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
