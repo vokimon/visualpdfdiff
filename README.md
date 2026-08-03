@@ -107,6 +107,10 @@ myTest:
 
 ## CHANGES
 
+### 2.0.1 (2026-08-03)
+
+- Distribution fixes
+
 ### 2.0 (2026-08-03)
 
 - Dropped Python 2
