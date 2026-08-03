@@ -92,11 +92,34 @@ def mask_paint(target, mask, rgba):
 
 
 def build_diff_mask(img_a, img_b):
-	"""Compare two Wand images. Returns (diff_image, ndiffs)."""
-	diff, ndiffs = img_a.compare(
-		img_b, metric='absolute', highlight='white', lowlight='black',
-	)
-	return diff, ndiffs
+	"""Compare two Wand images pixel-by-pixel. Returns (diff_image, ndiffs)."""
+	from wand.image import Image
+	from wand.color import Color
+
+	w_a, h_a = img_a.width, img_a.height
+	w_b, h_b = img_b.width, img_b.height
+	w, h = max(w_a, w_b), max(h_a, h_b)
+
+	a = np.array(img_a.export_pixels(channel_map='RGB'), dtype=np.uint8).reshape(h_a, w_a, 3)
+	b = np.array(img_b.export_pixels(channel_map='RGB'), dtype=np.uint8).reshape(h_b, w_b, 3)
+
+	canvas_a = np.full((h, w, 3), 255, dtype=np.uint8)
+	canvas_b = np.full((h, w, 3), 255, dtype=np.uint8)
+	canvas_a[:h_a, :w_a] = a
+	canvas_b[:h_b, :w_b] = b
+
+	mask = (np.abs(canvas_a.astype(int) - canvas_b.astype(int)).sum(axis=2) > 0).astype(np.uint8) * 255
+
+	ndiffs = mask.sum() / (255.0 * w * h)
+
+	rgb = np.stack([mask, mask, mask], axis=2).astype(np.uint8)
+	alpha = np.where(mask > 0, 255, 255).astype(np.uint8)
+	rgba = np.concatenate([rgb, alpha.reshape(h, w, 1)], axis=2)
+
+	result = Image(width=w, height=h)
+	result.import_pixels(0, 0, w, h, 'RGBA', 'char', rgba.tobytes())
+
+	return result, ndiffs
 
 
 def buildDiffPdf(a, b, overlay, output, **params):
