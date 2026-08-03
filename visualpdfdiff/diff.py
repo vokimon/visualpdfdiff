@@ -28,7 +28,24 @@ def tmpchanges(context):
 		"- {}".format(tmp) for tmp in removed] + [
 		"  {}".format(tmp) for tmp in current-tmpchanges.initial-added] + [
 	]))
-	
+
+
+def side_by_side(page_a, page_b):
+	"""Merge page_b to the right of page_a. Returns new page."""
+	page_a.merge_translated_page(page_b, tx=page_a.mediabox.width, ty=0, expand=True)
+	return page_a
+
+
+def overlay_image(page, image):
+	"""Merge a Wand image (as PDF) onto a pypdf page. Returns new page."""
+	import pypdf
+	from io import BytesIO
+	image.format = 'pdf'
+	blob = image.make_blob()
+	overlay_page = pypdf.PdfReader(BytesIO(blob)).pages[0]
+	page.merge_translated_page(overlay_page, tx=0, ty=0, expand=True)
+	return page
+
 
 def build_diff_mask(img_a, img_b):
 	"""Compare two Wand images. Returns (diff_image, ndiffs)."""
