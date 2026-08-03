@@ -2,7 +2,7 @@
 
 [![CI Status](https://github.com/vokimon/visualpdfdiff/actions/workflows/main.yml/badge.svg)](https://github.com/vokimon/visualpdfdiff/actions/workflows/main.yml)
 [![Coverage Status](https://coveralls.io/repos/github/vokimon/visualpdfdiff/badge.svg?branch=master)](https://coveralls.io/github/vokimon/visualpdfdiff?branch=master)
-![PyPI](https://img.shields.io/pypi/v/visualpdfdiff)
+[![PyPi](https://img.shields.io/pypi/v/visualpdfdiff.svg?style=flat-square&label=PyPI)](https://pypi.org/project/visualpdfdif/)
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/visualpdfdiff)
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/visualpdfdiff)
 
