@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "visualpdfdiff"
-version = "1.0"
+version = "2.0"
 description = "Side by side visual comparison differences for PDF documents"
 license = "GPL-3.0-or-later"
 requires-python = ">=3.10"
