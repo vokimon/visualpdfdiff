@@ -75,6 +75,29 @@ def array_to_img(arr, channels='RGBA'):
 	return img
 
 
+def dilate(mask, size, kernel='square'):
+	"""Binary dilation. mask is (h, w) uint8, size is kernel diameter.
+	kernel: 'square' or 'circle'.
+	"""
+	h, w = mask.shape
+	result = np.zeros_like(mask, dtype=np.uint8)
+	offsets = [
+		(dy, dx)
+		for dy in range(-(size//2), size//2 + 1)
+		for dx in range(-(size//2), size//2 + 1)
+	]
+	print(offsets)
+
+	for dy, dx in offsets:
+		sy = slice(max(0, -dy), min(h, h - dy))
+		sx = slice(max(0, -dx), min(w, w - dx))
+		ry = slice(max(0, dy), min(h, h + dy))
+		rx = slice(max(0, dx), min(w, w + dx))
+		result[ry, rx] |= mask[sy, sx]
+
+	return result
+
+
 def mask_paint(target, mask, rgba):
 	"""Paint color onto target where mask is white."""
 	from wand.color import Color
@@ -201,26 +224,19 @@ def highlightDifferences(diffimage, margin=2, edge_width=2):
 
 	total = margin + edge_width
 
-	diffimage.alpha_channel='activate'
-	with diffimage.clone() as total_area:
-		total_area.morphology(method='dilate', kernel=f'square:{total}')
+	m = img_to_array(diffimage, 'R')[:, :, 0]
+	total_mask = dilate(m, total*2+1)
+	interior_mask = dilate(m, margin*2+1)
 
-		diffimage.morphology(method='dilate', kernel=f'square:{margin}')
+	h, w = m.shape
+	rgba = np.zeros((h, w, 4), dtype=np.uint8)
+	rgba[:] = [255, 255, 0, 127]
+	rgba[total_mask!=0] = [255, 0, 0, 255]
+	rgba[interior_mask!=0] = [0, 0, 0, 0]
 
-		with diffimage.clone() as interior:
-			total_area.composite(interior, operator='difference')
+	result = array_to_img(rgba, 'RGBA')
+	diffimage.composite(result, 0, 0, 'copy')
 
-			with Image(width=diffimage.width, height=diffimage.height) as result:
-				result.alpha_channel='activate'
-				result.channel = 'argb'
-				result.alpha_channel = 'set'
-				result.background_color = Color('rgba(255,255,0,0.4)')
-				result.alpha_channel = 'remove'
-
-				mask_paint(result, total_area, 'rgba(255,0,0,1)')
-				mask_paint(result, interior, 'rgba(0,0,0,0)')
-
-				diffimage.composite(result, 0, 0, 'copy')
 
 def rasterize(pdfimage):
 	# pdf's just have the inked parts, so,

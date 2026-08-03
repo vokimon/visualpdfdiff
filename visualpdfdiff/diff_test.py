@@ -12,7 +12,9 @@ from visualpdfdiff.diff import (
     highlightDifferences,
     centeredText,
     mask_paint,
+    dilate,
 )
+import numpy as np
 
 COLOR_MAP = {
     '.': (0, 0, 0),
@@ -239,6 +241,69 @@ class TestPdfPrimitives(unittest.TestCase):
         self.assertEqual(img_to_str(img), "\n".join(
             ["W" * 2 + "R" * 2] * 2
         ))
+
+def boolarray2string(array):
+    return "\n".join([
+        "".join([
+            "1" if x else "0"
+            for x in row
+        ])
+        for row in array
+    ])
+
+def string2boolarray(string):
+    return np.array(
+        [
+            [
+                0 if c == "0" else 1
+                for c in line
+            ]
+            for line in string.split("\n")
+        ],
+        dtype=bool,
+    )
+
+class TestDilate(unittest.TestCase):
+    def setUp(self):
+        self.maxDiff = None
+
+    def test_dilate_square_kernel_size_3(self):
+        mask = string2boolarray(
+            "000000\n"
+            "000000\n"
+            "001000\n"
+            "000000\n"
+            "000000"
+        )
+        
+        result = dilate(mask, size=3, kernel="square")
+
+        self.assertEqual(boolarray2string(result), 
+            "000000\n"
+            "011100\n"
+            "011100\n"
+            "011100\n"
+            "000000"
+        )
+
+    def test_dilate_square_kernel_size_5(self):
+        mask = string2boolarray(
+            "000000\n"
+            "000000\n"
+            "001000\n"
+            "000000\n"
+            "000000"
+        )
+        
+        result = dilate(mask, size=5, kernel="square")
+
+        self.assertEqual(boolarray2string(result), 
+            "111110\n"
+            "111110\n"
+            "111110\n"
+            "111110\n"
+            "111110"
+        )
 
 if __name__ == '__main__':
     unittest.main()
