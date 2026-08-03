@@ -26,7 +26,7 @@ setup(
 			'visualpdfdiff=visualpdfdiff.diff:main',
 		],
 		'back2back.diff': [
-			'pdf=visualpdfdiff.diff:diff',
+			'pdf=visualpdfdiff.diff:differences',
 		]
 	},
 	test_suite = 'b2btest-pdf',

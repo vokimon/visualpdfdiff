@@ -238,6 +238,22 @@ def visualEqual(a, b, outputdiff=None, **params):
 def diff(a,b,diff):
 	return visualEqual(Path(a), Path(b), diff and Path(diff))
 
+def differences(expected, result, diffbase):
+	"""b2btest plugin interface: returns list of difference descriptions."""
+	result_pdf = Path(diffbase + '.pdf')
+	has_diffs = visualEqual(
+		Path(expected), Path(result),
+		result_pdf,
+	)
+	if not has_diffs:
+		return []
+	return [
+		f"Visual differences found between {expected} and {result}. "
+		f"See diff output at {result_pdf}"
+	]
+
+differences.extensions = ['.pdf']
+
 usage="""\
 Usage: {} <doc1.pdf> <doc2.pdf> [<diff.pdf>]
 
