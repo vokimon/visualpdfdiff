@@ -101,7 +101,6 @@ def dilate(mask, size, kernel="square"):
         for dy in range(-(size // 2), size // 2 + 1)
         for dx in range(-(size // 2), size // 2 + 1)
     ]
-    print(offsets)
 
     for dy, dx in offsets:
         sy = slice(max(0, -dy), min(h, h - dy))
