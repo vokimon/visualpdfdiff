@@ -32,10 +32,10 @@ dependencies = [
 Homepage = "https://github.com/vokimon/visualpdfdiff"
 
 [project.scripts]
-visualpdfdiff = "visualpdfdiff.diff:main"
+visualpdfdiff = "visualpdfdiff.cli:main"
 
 [project.entry-points."back2back.diff"]
-pdf = "visualpdfdiff.diff:differences"
+pdf = "visualpdfdiff:differences"
 
 [tool.setuptools.packages.find]
 exclude = ["*_test"]

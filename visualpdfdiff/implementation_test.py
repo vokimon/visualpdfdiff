@@ -4,7 +4,7 @@ import pypdf
 from wand.image import Image
 from wand.color import Color
 from wand.drawing import Drawing
-from visualpdfdiff.diff import (
+from .implementation import (
     build_diff_mask,
     side_by_side,
     overlay_image,
