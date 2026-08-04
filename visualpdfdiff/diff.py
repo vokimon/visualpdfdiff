@@ -96,11 +96,20 @@ def dilate(mask, size, kernel="square"):
     """
     h, w = mask.shape
     result = np.zeros_like(mask, dtype=np.uint8)
-    offsets = [
-        (dy, dx)
-        for dy in range(-(size // 2), size // 2 + 1)
-        for dx in range(-(size // 2), size // 2 + 1)
-    ]
+    if kernel == "square":
+        offsets = [
+            (dy, dx)
+            for dy in range(-(size // 2), size // 2 + 1)
+            for dx in range(-(size // 2), size // 2 + 1)
+        ]
+    elif kernel == "circle":
+        r = size // 2
+        offsets = [
+            (dy, dx)
+            for dy in range(-r, r + 1)
+            for dx in range(-r, r + 1)
+            if dy**2 + dx**2 <= r**2
+        ]
 
     for dy, dx in offsets:
         sy = slice(max(0, -dy), min(h, h - dy))

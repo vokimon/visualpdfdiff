@@ -312,5 +312,27 @@ class TestDilate(unittest.TestCase):
         )
 
 
+    def test_dilate_circle_kernel(self):
+        mask = string2boolarray(lines(
+            "0000000",
+            "0000000",
+            "0000000",
+            "0001000",
+            "0000000",
+            "0000000",
+            "0000000",
+        ))
+        result = dilate(mask, size=5, kernel="circle")
+        self.assertEqual(boolarray2string(result), lines(
+            "0000000",
+            "0001000",
+            "0011100",
+            "0111110",
+            "0011100",
+            "0001000",
+            "0000000",
+        ))
+
+
 if __name__ == "__main__":
     unittest.main()
