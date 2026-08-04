@@ -25,6 +25,8 @@ COLOR_MAP = {
     "Y": (1, 1, 0),
 }
 
+def lines(*lines):
+    return "\n".join(lines)
 
 def str_to_img(s):
     lines = s.split("\n")
@@ -58,7 +60,7 @@ def img_to_str(img):
             else:
                 row += "."
         rows.append(row)
-    return "\n".join(rows)
+    return lines(*rows)
 
 
 class TestDiffMask(unittest.TestCase):
@@ -91,14 +93,14 @@ class TestHighlightDifferences(unittest.TestCase):
         with Image(width=7, height=7) as mask:
             mask[3, 3] = "white"
             highlightDifferences(mask, margin=1, edge_width=1)
-            expected = (
-                "SSSSSSS\n"
-                "SRRRRRS\n"
-                "SRTTTRS\n"
-                "SRTTTRS\n"
-                "SRTTTRS\n"
-                "SRRRRRS\n"
-                "SSSSSSS"
+            expected = lines(
+                "SSSSSSS",
+                "SRRRRRS",
+                "SRTTTRS",
+                "SRTTTRS",
+                "SRTTTRS",
+                "SRRRRRS",
+                "SSSSSSS",
             )
             self.assertEqual(img_to_str(mask), expected)
 
@@ -106,16 +108,16 @@ class TestHighlightDifferences(unittest.TestCase):
         with Image(width=9, height=9) as mask:
             mask[4, 4] = "white"
             highlightDifferences(mask, margin=2, edge_width=1)
-            expected = (
-                "SSSSSSSSS\n"
-                "SRRRRRRRS\n"
-                "SRTTTTTRS\n"
-                "SRTTTTTRS\n"
-                "SRTTTTTRS\n"
-                "SRTTTTTRS\n"
-                "SRTTTTTRS\n"
-                "SRRRRRRRS\n"
-                "SSSSSSSSS"
+            expected = lines(
+                "SSSSSSSSS",
+                "SRRRRRRRS",
+                "SRTTTTTRS",
+                "SRTTTTTRS",
+                "SRTTTTTRS",
+                "SRTTTTTRS",
+                "SRTTTTTRS",
+                "SRRRRRRRS",
+                "SSSSSSSSS",
             )
             self.assertEqual(img_to_str(mask), expected)
 
@@ -123,16 +125,16 @@ class TestHighlightDifferences(unittest.TestCase):
         with Image(width=9, height=9) as mask:
             mask[4, 4] = "white"
             highlightDifferences(mask, margin=1, edge_width=2)
-            expected = (
-                "SSSSSSSSS\n"
-                "SRRRRRRRS\n"
-                "SRRRRRRRS\n"
-                "SRRTTTRRS\n"
-                "SRRTTTRRS\n"
-                "SRRTTTRRS\n"
-                "SRRRRRRRS\n"
-                "SRRRRRRRS\n"
-                "SSSSSSSSS"
+            expected = lines(
+                "SSSSSSSSS",
+                "SRRRRRRRS",
+                "SRRRRRRRS",
+                "SRRTTTRRS",
+                "SRRTTTRRS",
+                "SRRTTTRRS",
+                "SRRRRRRRS",
+                "SRRRRRRRS",
+                "SSSSSSSSS",
             )
             self.assertEqual(img_to_str(mask), expected)
 
@@ -153,11 +155,11 @@ class TestMaskPaint(unittest.TestCase):
         target.alpha_channel = "remove"
         mask = _make_test_mask()
         mask_paint(target, mask, "rgba(255,0,0,1)")
-        self.assertEqual(img_to_str(target), (
-            "WWWW\n"
-            "WRRW\n"
-            "WRRW\n"
-            "WWWW"
+        self.assertEqual(img_to_str(target), lines(
+            "WWWW",
+            "WRRW",
+            "WRRW",
+            "WWWW",
         ))
         target.close()
         mask.close()
@@ -168,11 +170,11 @@ class TestMaskPaint(unittest.TestCase):
         target.alpha_channel = "remove"
         mask = _make_test_mask()
         mask_paint(target, mask, "rgba(1,1,0,0)")
-        self.assertEqual(img_to_str(target), (
-            "WWWW\n"
-            "WTTW\n"
-            "WTTW\n"
-            "WWWW"
+        self.assertEqual(img_to_str(target), lines(
+            "WWWW",
+            "WTTW",
+            "WTTW",
+            "WWWW",
         ))
         target.close()
         mask.close()
@@ -255,42 +257,42 @@ class TestDilate(unittest.TestCase):
         self.maxDiff = None
 
     def test_dilate_square_kernel_size_3(self):
-        mask = string2boolarray(
-            "000000\n"
-            "000000\n"
-            "001000\n"
-            "000000\n"
-            "000000"
-        )
+        mask = string2boolarray(lines(
+            "000000",
+            "000000",
+            "001000",
+            "000000",
+            "000000",
+        ))
         
         result = dilate(mask, size=3, kernel="square")
 
-        self.assertEqual(boolarray2string(result), 
-            "000000\n"
-            "011100\n"
-            "011100\n"
-            "011100\n"
-            "000000"
-        )
+        self.assertEqual(boolarray2string(result), lines(
+            "000000",
+            "011100",
+            "011100",
+            "011100",
+            "000000",
+        ))
 
     def test_dilate_square_kernel_size_5(self):
-        mask = string2boolarray(
-            "000000\n"
-            "000000\n"
-            "001000\n"
-            "000000\n"
-            "000000"
-        )
+        mask = string2boolarray(lines(
+            "000000",
+            "000000",
+            "001000",
+            "000000",
+            "000000",
+        ))
         
         result = dilate(mask, size=5, kernel="square")
 
-        self.assertEqual(boolarray2string(result), 
-            "111110\n"
-            "111110\n"
-            "111110\n"
-            "111110\n"
-            "111110"
-        )
+        self.assertEqual(boolarray2string(result), lines(
+            "111110",
+            "111110",
+            "111110",
+            "111110",
+            "111110",
+        ))
 
 
 if __name__ == "__main__":
