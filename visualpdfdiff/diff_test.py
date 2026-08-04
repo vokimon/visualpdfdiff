@@ -25,8 +25,10 @@ COLOR_MAP = {
     "Y": (1, 1, 0),
 }
 
+
 def lines(*lines):
     return "\n".join(lines)
+
 
 def str_to_img(s):
     lines = s.split("\n")
@@ -155,12 +157,15 @@ class TestMaskPaint(unittest.TestCase):
         target.alpha_channel = "remove"
         mask = _make_test_mask()
         mask_paint(target, mask, "rgba(255,0,0,1)")
-        self.assertEqual(img_to_str(target), lines(
-            "WWWW",
-            "WRRW",
-            "WRRW",
-            "WWWW",
-        ))
+        self.assertEqual(
+            img_to_str(target),
+            lines(
+                "WWWW",
+                "WRRW",
+                "WRRW",
+                "WWWW",
+            ),
+        )
         target.close()
         mask.close()
 
@@ -170,12 +175,15 @@ class TestMaskPaint(unittest.TestCase):
         target.alpha_channel = "remove"
         mask = _make_test_mask()
         mask_paint(target, mask, "rgba(1,1,0,0)")
-        self.assertEqual(img_to_str(target), lines(
-            "WWWW",
-            "WTTW",
-            "WTTW",
-            "WWWW",
-        ))
+        self.assertEqual(
+            img_to_str(target),
+            lines(
+                "WWWW",
+                "WTTW",
+                "WTTW",
+                "WWWW",
+            ),
+        )
         target.close()
         mask.close()
 
@@ -223,9 +231,7 @@ class TestPdfPrimitives(unittest.TestCase):
         result = side_by_side(red, blue)
         img = rasterize_page(result)
         row = img_to_str(img)
-        self.assertEqual(row, "\n".join(
-            ["R" * 10 + "B" * 10]*10
-        ))
+        self.assertEqual(row, "\n".join(["R" * 10 + "B" * 10] * 10))
 
     def test_overlay_image(self):
         white = make_page(1, 1, 1, 20, 10)
@@ -239,12 +245,12 @@ class TestPdfPrimitives(unittest.TestCase):
         red = make_page(1, 0, 0, 2, 2)
         result = overlay_page(white, red, tx=2)
         img = rasterize_page(result)
-        self.assertEqual(img_to_str(img), "\n".join(
-            ["W" * 2 + "R" * 2] * 2
-        ))
+        self.assertEqual(img_to_str(img), "\n".join(["W" * 2 + "R" * 2] * 2))
+
 
 def boolarray2string(array):
     return "\n".join(["".join(["1" if x else "0" for x in row]) for row in array])
+
 
 def string2boolarray(string):
     return np.array(
@@ -252,47 +258,58 @@ def string2boolarray(string):
         dtype=bool,
     )
 
+
 class TestDilate(unittest.TestCase):
     def setUp(self):
         self.maxDiff = None
 
     def test_dilate_square_kernel_size_3(self):
-        mask = string2boolarray(lines(
-            "000000",
-            "000000",
-            "001000",
-            "000000",
-            "000000",
-        ))
-        
+        mask = string2boolarray(
+            lines(
+                "000000",
+                "000000",
+                "001000",
+                "000000",
+                "000000",
+            )
+        )
+
         result = dilate(mask, size=3, kernel="square")
 
-        self.assertEqual(boolarray2string(result), lines(
-            "000000",
-            "011100",
-            "011100",
-            "011100",
-            "000000",
-        ))
+        self.assertEqual(
+            boolarray2string(result),
+            lines(
+                "000000",
+                "011100",
+                "011100",
+                "011100",
+                "000000",
+            ),
+        )
 
     def test_dilate_square_kernel_size_5(self):
-        mask = string2boolarray(lines(
-            "000000",
-            "000000",
-            "001000",
-            "000000",
-            "000000",
-        ))
-        
+        mask = string2boolarray(
+            lines(
+                "000000",
+                "000000",
+                "001000",
+                "000000",
+                "000000",
+            )
+        )
+
         result = dilate(mask, size=5, kernel="square")
 
-        self.assertEqual(boolarray2string(result), lines(
-            "111110",
-            "111110",
-            "111110",
-            "111110",
-            "111110",
-        ))
+        self.assertEqual(
+            boolarray2string(result),
+            lines(
+                "111110",
+                "111110",
+                "111110",
+                "111110",
+                "111110",
+            ),
+        )
 
 
 if __name__ == "__main__":
