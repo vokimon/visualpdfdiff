@@ -36,7 +36,7 @@ If you are running a web server accepting PDF files from outside,
 please, consider the security implications.
 
 Edit `/etc/ImageMagick-*/policy.xml` and 
-uncomment th line:
+uncomment the line:
 ```xml
 <policy domain="coder" rights="read | write" pattern="PDF" />
 ```
@@ -45,7 +45,7 @@ And comment the line:
 <!-- <policy domain="coder" rights="none" pattern="PDF" /> -->
 ```
 
-## Comand line diff tool
+## Command line diff tool
 
 ```bash
 visualpdfdiff a.pdf b.pdf [output-diff.pdf]
