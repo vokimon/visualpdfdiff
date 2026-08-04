@@ -107,10 +107,11 @@ myTest:
 
 ## CHANGES
 
-### Unreleased
+### 2.0.2 (2026-08-04)
 
 - 💥 `diff` subpackage is now `implementation` and should not be used directly
 - 🐛 public symbols available at top level package, as documented
+- ✨ circle kernel
 - 🐛 removed debug print
 - 🎨 black style applied
 
